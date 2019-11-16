@@ -76,6 +76,7 @@ antlrcpp::Any EvalVisitor::visitCompound_stmt(Python3Parser::Compound_stmtContex
 
 antlrcpp::Any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx)
 {
+
 	return visitChildren(ctx);
 }
 
@@ -96,17 +97,58 @@ antlrcpp::Any EvalVisitor::visitTest(Python3Parser::TestContext *ctx)
 
 antlrcpp::Any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx)
 {
-	return visitChildren(ctx);
+	auto and_tests = ctx->and_test();
+	antlrcpp::Any ret;
+	for (auto it = and_tests.begin(); it != and_tests.end(); it++)
+	{
+		ret = visit(*it);
+		if (ret.is<bool>())
+		{
+			if (ret.as<bool>())
+			{
+				return true;
+			}
+		}
+		else
+		{
+			throw("Type error: expected boolean.\n");
+		}
+	}
+	return false;
 }
 
 antlrcpp::Any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx)
 {
-	return visitChildren(ctx);
+	auto not_tests = ctx->not_test();
+	antlrcpp::Any ret;
+	for (auto it = not_tests.begin(); it != not_tests.end(); it++)
+	{
+		ret = visit(*it);
+		if (ret.is<bool>())
+		{
+			if (!ret.as<bool>())
+			{
+				return false;
+			}
+		}
+		else
+		{
+			throw("Type error: expected boolean.\n");
+		}
+	}
+	return true;
 }
 
 antlrcpp::Any EvalVisitor::visitNot_test(Python3Parser::Not_testContext *ctx)
 {
-	return visitChildren(ctx);
+	auto not_test = ctx->not_test();
+	auto comparison = ctx->comparison();
+	if (
+	{
+		/* code */
+	}
+	
+	return !visitChildren(ctx).as<bool>;
 }
 
 antlrcpp::Any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx)
@@ -146,6 +188,7 @@ antlrcpp::Any EvalVisitor::visitTrailer(Python3Parser::TrailerContext *ctx)
 
 antlrcpp::Any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx)
 {
+	ctx->NAME();
 	return visitChildren(ctx);
 }
 
