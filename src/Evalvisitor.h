@@ -8,6 +8,7 @@
 #include <stack>
 #include <unordered_map>
 #include <utility>
+#include "BigInt.h"
 
 class EvalVisitor: public Python3BaseVisitor
 {
