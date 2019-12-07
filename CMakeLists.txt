@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(python_interpreter)
 set(CMAKE_CXX_STANDARD 14)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -g")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -g")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -O3")
 include_directories(
         ${PROJECT_SOURCE_DIR}/generated/
         ${PROJECT_SOURCE_DIR}/third_party/
@@ -28,5 +29,6 @@ file(GLOB src_executable
         ${PROJECT_SOURCE_DIR}/src/*.cpp
         )
 add_library (antlr4-cpp-runtime ${antlr4-cpp-src})
-add_executable(python_interpreter ${src_dir} ${src_executable})
+#add_executable(python_interpreter ${src_dir} ${src_executable})
+add_executable(code ${src_dir} ${src_executable})
 target_link_libraries(python_interpreter antlr4-cpp-runtime)

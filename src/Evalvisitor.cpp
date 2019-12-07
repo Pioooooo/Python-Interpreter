@@ -399,7 +399,7 @@ antlrcpp::Any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx)
 	}
 }
 
-antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)//TODO: Lots of things here
+antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 {
 	if(!ctx->trailer())
 	{
@@ -532,7 +532,7 @@ antlrcpp::Any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	return tmp;
 }
 
-antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)//TODO: Lots of things here
+antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)
 {
 	auto arguments = ctx->argument();
 	List ret;
