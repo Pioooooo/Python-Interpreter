@@ -22,3 +22,10 @@ Everything
 
 > 1. Add declaration of the virtual functions in class Python3Parser
 > 2. New branch dev for better version control
+
+* **2019/12/08:**
+
+> 1. Install and comfigure CLion
+> 2. Finish class BigInt, class Object
+> 3. Modified Python3.g4 and regenerated antlr runtime libraries
+> 4. Implement functions to be overrided in Evalvisitor

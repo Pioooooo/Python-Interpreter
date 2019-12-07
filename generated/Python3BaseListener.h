@@ -1,5 +1,5 @@
 
-// Generated from .\Python3.g4 by ANTLR 4.7.2
+// Generated from generated/Python3.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -91,8 +91,14 @@ public:
   virtual void enterArith_expr(Python3Parser::Arith_exprContext * /*ctx*/) override { }
   virtual void exitArith_expr(Python3Parser::Arith_exprContext * /*ctx*/) override { }
 
+  virtual void enterAddsub_op(Python3Parser::Addsub_opContext * /*ctx*/) override { }
+  virtual void exitAddsub_op(Python3Parser::Addsub_opContext * /*ctx*/) override { }
+
   virtual void enterTerm(Python3Parser::TermContext * /*ctx*/) override { }
   virtual void exitTerm(Python3Parser::TermContext * /*ctx*/) override { }
+
+  virtual void enterMuldiv_op(Python3Parser::Muldiv_opContext * /*ctx*/) override { }
+  virtual void exitMuldiv_op(Python3Parser::Muldiv_opContext * /*ctx*/) override { }
 
   virtual void enterFactor(Python3Parser::FactorContext * /*ctx*/) override { }
   virtual void exitFactor(Python3Parser::FactorContext * /*ctx*/) override { }

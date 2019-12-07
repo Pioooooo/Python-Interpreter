@@ -1,5 +1,5 @@
 
-// Generated from .\Python3.g4 by ANTLR 4.7.2
+// Generated from generated/Python3.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -69,7 +69,11 @@ public:
 
     virtual antlrcpp::Any visitArith_expr(Python3Parser::Arith_exprContext *context) = 0;
 
+    virtual antlrcpp::Any visitAddsub_op(Python3Parser::Addsub_opContext *context) = 0;
+
     virtual antlrcpp::Any visitTerm(Python3Parser::TermContext *context) = 0;
+
+    virtual antlrcpp::Any visitMuldiv_op(Python3Parser::Muldiv_opContext *context) = 0;
 
     virtual antlrcpp::Any visitFactor(Python3Parser::FactorContext *context) = 0;
 
