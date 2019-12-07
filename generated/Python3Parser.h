@@ -1,5 +1,5 @@
 
-// Generated from .\Python3.g4 by ANTLR 4.7.2
+// Generated from generated/Python3.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -37,9 +37,9 @@ public:
     RuleContinue_stmt = 12, RuleReturn_stmt = 13, RuleCompound_stmt = 14, 
     RuleIf_stmt = 15, RuleWhile_stmt = 16, RuleSuite = 17, RuleTest = 18, 
     RuleOr_test = 19, RuleAnd_test = 20, RuleNot_test = 21, RuleComparison = 22, 
-    RuleComp_op = 23, RuleArith_expr = 24, RuleTerm = 25, RuleFactor = 26, 
-    RuleAtom_expr = 27, RuleTrailer = 28, RuleAtom = 29, RuleTestlist = 30, 
-    RuleArglist = 31, RuleArgument = 32
+    RuleComp_op = 23, RuleArith_expr = 24, RuleAddsub_op = 25, RuleTerm = 26, 
+    RuleMuldiv_op = 27, RuleFactor = 28, RuleAtom_expr = 29, RuleTrailer = 30, 
+    RuleAtom = 31, RuleTestlist = 32, RuleArglist = 33, RuleArgument = 34
   };
 
   Python3Parser(antlr4::TokenStream *input);
@@ -77,7 +77,9 @@ public:
   class ComparisonContext;
   class Comp_opContext;
   class Arith_exprContext;
+  class Addsub_opContext;
   class TermContext;
+  class Muldiv_opContext;
   class FactorContext;
   class Atom_exprContext;
   class TrailerContext;
@@ -519,10 +521,8 @@ public:
     virtual size_t getRuleIndex() const override;
     std::vector<TermContext *> term();
     TermContext* term(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> ADD();
-    antlr4::tree::TerminalNode* ADD(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> MINUS();
-    antlr4::tree::TerminalNode* MINUS(size_t i);
+    std::vector<Addsub_opContext *> addsub_op();
+    Addsub_opContext* addsub_op(size_t i);
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -533,20 +533,30 @@ public:
 
   Arith_exprContext* arith_expr();
 
+  class  Addsub_opContext : public antlr4::ParserRuleContext {
+  public:
+    Addsub_opContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ADD();
+    antlr4::tree::TerminalNode *MINUS();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Addsub_opContext* addsub_op();
+
   class  TermContext : public antlr4::ParserRuleContext {
   public:
     TermContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<FactorContext *> factor();
     FactorContext* factor(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> STAR();
-    antlr4::tree::TerminalNode* STAR(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> DIV();
-    antlr4::tree::TerminalNode* DIV(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> IDIV();
-    antlr4::tree::TerminalNode* IDIV(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> MOD();
-    antlr4::tree::TerminalNode* MOD(size_t i);
+    std::vector<Muldiv_opContext *> muldiv_op();
+    Muldiv_opContext* muldiv_op(size_t i);
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -557,13 +567,30 @@ public:
 
   TermContext* term();
 
+  class  Muldiv_opContext : public antlr4::ParserRuleContext {
+  public:
+    Muldiv_opContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *STAR();
+    antlr4::tree::TerminalNode *DIV();
+    antlr4::tree::TerminalNode *IDIV();
+    antlr4::tree::TerminalNode *MOD();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Muldiv_opContext* muldiv_op();
+
   class  FactorContext : public antlr4::ParserRuleContext {
   public:
     FactorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    Addsub_opContext *addsub_op();
     FactorContext *factor();
-    antlr4::tree::TerminalNode *ADD();
-    antlr4::tree::TerminalNode *MINUS();
     Atom_exprContext *atom_expr();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;

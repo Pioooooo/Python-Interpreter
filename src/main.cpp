@@ -7,21 +7,21 @@ using namespace antlr4;
 //todo: regenerating files in directory named "generated" is dangerous.
 //       if you really need to regenerate,please ask TA for help.
 int main(int argc, const char* argv[]){
-    //todo:please don't modify the code below the construction of ifs if you want to use visitor mode
-    const std::string filepath="testData/test"+std::string(argv[1])+".in";
-    std::ifstream ifs;
-    ifs.open(filepath);
-    if (!ifs.good()) {
-        std::cout<<"bad";
-    }
-    ANTLRInputStream input(ifs);
-    Python3Lexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
-    tokens.fill();
-    Python3Parser parser(&tokens);
-    tree::ParseTree* tree=parser.file_input();
-    EvalVisitor visitor;
-    visitor.visit(tree);
-    ifs.close();
-    return 0;
+	//todo:please don't modify the code below the construction of ifs if you want to use visitor mode
+	const std::string filepath=argv[1];
+	std::ifstream ifs;
+	ifs.open(filepath);
+	if (!ifs.good()) {
+		std::cout<<"bad";
+	}
+	ANTLRInputStream input(ifs);
+	Python3Lexer lexer(&input);
+	CommonTokenStream tokens(&lexer);
+	tokens.fill();
+	Python3Parser parser(&tokens);
+	tree::ParseTree* tree=parser.file_input();
+	EvalVisitor visitor;
+	visitor.visit(tree);
+	ifs.close();
+	return 0;
 }

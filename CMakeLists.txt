@@ -24,6 +24,9 @@ file(GLOB antlr4-cpp-src
         ${PROJECT_SOURCE_DIR}/third_party/runtime/src/tree/pattern/*.cpp
         ${PROJECT_SOURCE_DIR}/third_party/runtime/src/tree/xpath/*.cpp
         )
+file(GLOB src_executable
+        ${PROJECT_SOURCE_DIR}/src/*.cpp
+        )
 add_library (antlr4-cpp-runtime ${antlr4-cpp-src})
-add_executable(python_interpreter ${src_dir} src/main.cpp)
+add_executable(python_interpreter ${src_dir} ${src_executable})
 target_link_libraries(python_interpreter antlr4-cpp-runtime)
