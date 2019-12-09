@@ -6,7 +6,7 @@
 BigInt::BigInt()
 {
 	number.push_back(0);
-	positive = 0;
+	positive = false;
 }
 
 BigInt::BigInt(long long a)
@@ -19,7 +19,7 @@ BigInt::BigInt(long long a)
 		number.push_back(a % base);
 		a /= base;
 	}
-	if(number.size() == 0)
+	if(number.empty())
 		number.push_back(0);
 }
 
@@ -53,19 +53,14 @@ BigInt::BigInt(std::string a)
 	}
 	if(val)
 		number.push_back(val);
-	if(number.size() == 0)
+	if(number.empty())
 	{
-		positive = 0;
+		positive = false;
 		number.push_back(0);
 	}
 }
 
-BigInt &BigInt::operator=(const BigInt &b)
-{
-	this->positive = b.positive;
-	this->number = b.number;
-	return *this;
-}
+BigInt &BigInt::operator=(const BigInt &b) = default;
 
 BigInt &BigInt::operator+=(const BigInt &b)
 {
@@ -98,7 +93,7 @@ BigInt &BigInt::operator-=(const BigInt &b)
 	{
 		tmp = *this;
 		*this = b;
-		positive ^= 1;
+		positive ^= true;
 	}
 	else
 		tmp = b;
@@ -126,7 +121,7 @@ BigInt &BigInt::operator-=(const BigInt &b)
 	if(number.empty())
 	{
 		number.push_back(0);
-		positive = 0;
+		positive = false;
 	}
 	return *this;
 }
@@ -140,9 +135,12 @@ BigInt &BigInt::operator/=(const BigInt &b)
 {
 	BigInt ret;
 	ret.positive = positive ^ b.positive;
-	ret.number.resize(number.size() - b.number.size() + 1);
 	if(b.number.size() == 1 && b.number[0] == 0)
-		throw ("Error: divisor cannot be 0.\n");
+	{
+		std::cerr << "Error: divisor cannot be 0.\n";
+		return *this;
+	}
+	ret.number.resize(number.size() - b.number.size() + 1);
 	for(int i = number.size() - b.number.size(); i >= 0; i--)
 	{
 		while(greater(*this, b, i))
@@ -164,7 +162,7 @@ BigInt &BigInt::operator/=(const BigInt &b)
 	if(ret.number.empty())
 	{
 		ret.number.push_back(0);
-		ret.positive = 0;
+		ret.positive = false;
 	}
 	if(*this != 0)
 		ret -= ret.positive;
@@ -177,7 +175,10 @@ BigInt &BigInt::operator%=(const BigInt &b)
 	ret.positive = positive ^ b.positive;
 	ret.number.resize(number.size() - b.number.size() + 1);
 	if(b.number.size() == 1 && b.number[0] == 0)
-		throw ("Error: divisor cannot be 0.\n");
+	{
+		std::cerr << "Error: divisor cannot be 0.\n";
+		return *this;
+	}
 	for(int i = number.size() - b.number.size(); i >= 0; i--)
 	{
 		while(greater(*this, b, i))
@@ -199,16 +200,16 @@ BigInt &BigInt::operator%=(const BigInt &b)
 	if(ret.number.empty())
 	{
 		ret.number.push_back(0);
-		ret.positive = 0;
+		ret.positive = false;
 	}
 	if(*this != 0)
 		ret -= ret.positive;
-	while(!(*this).number.empty() && (*this).number.back() == 0)
-		(*this).number.pop_back();
-	if((*this).number.empty())
+	while(!number.empty() && number.back() == 0)
+		number.pop_back();
+	if(number.empty())
 	{
-		(*this).number.push_back(0);
-		(*this).positive = 0;
+		number.push_back(0);
+		positive = false;
 	}
 	return *this;
 }
@@ -218,7 +219,7 @@ BigInt &BigInt::operator++()
 	return *this += 1;
 }
 
-const BigInt BigInt::operator++(int b)
+BigInt BigInt::operator++(int b)
 {
 	BigInt tmp = *this;
 	*this += 1;
@@ -230,7 +231,7 @@ BigInt &BigInt::operator--()
 	return *this -= 1;
 }
 
-const BigInt BigInt::operator--(int b)
+BigInt BigInt::operator--(int b)
 {
 	BigInt tmp = *this;
 	*this -= 1;
@@ -244,7 +245,10 @@ double BigInt::div(const BigInt &a, const BigInt &b)
 	ret.positive = rem.positive ^ b.positive;
 	ret.number.resize(rem.number.size() - b.number.size() + 1);
 	if(b.number.size() == 1 && b.number[0] == 0)
-		throw ("Error: divisor cannot be 0.\n");
+	{
+		std::cerr << "Error: divisor cannot be 0.\n";
+		return 0;
+	}
 	for(int i = rem.number.size() - b.number.size(); i >= 0; i--)
 	{
 		while(greater(rem, b, i))
@@ -266,7 +270,7 @@ double BigInt::div(const BigInt &a, const BigInt &b)
 	if(ret.number.empty())
 	{
 		ret.number.push_back(0);
-		ret.positive = 0;
+		ret.positive = false;
 	}
 	std::stringstream ans;
 	ans << ret;
@@ -291,7 +295,7 @@ std::istream &operator>>(std::istream &is, BigInt &a)
 	return is;
 }
 
-inline bool operator<(const BigInt &a, const BigInt &b)
+bool operator<(const BigInt &a, const BigInt &b)
 {
 	if(a.positive != b.positive)
 		return a.positive - b.positive;
@@ -306,27 +310,27 @@ inline bool operator<(const BigInt &a, const BigInt &b)
 	return false;
 }
 
-inline bool operator>(const BigInt &a, const BigInt &b)
+bool operator>(const BigInt &a, const BigInt &b)
 {
 	return b < a;
 }
 
-inline bool operator<=(const BigInt &a, const BigInt &b)
+bool operator<=(const BigInt &a, const BigInt &b)
 {
 	return !(b < a);
 }
 
-inline bool operator>=(const BigInt &a, const BigInt &b)
+bool operator>=(const BigInt &a, const BigInt &b)
 {
 	return !(a < b);
 }
 
-inline bool operator==(const BigInt &a, const BigInt &b)
+bool operator==(const BigInt &a, const BigInt &b)
 {
 	return a.positive == b.positive && a.number == b.number;
 }
 
-inline bool operator!=(const BigInt &a, const BigInt &b)
+bool operator!=(const BigInt &a, const BigInt &b)
 {
 	return !(a == b);
 }
@@ -354,8 +358,8 @@ BigInt operator*(const BigInt &a, const BigInt &b)
 		for(unsigned j = 0; j < b.number.size(); j++)
 		{
 			int temp = a.number[i] * b.number[j] + ret.number[i + j] + carry;
-			carry = temp / a.base;
-			ret.number[i + j] = temp % a.base;
+			carry = temp / BigInt::base;
+			ret.number[i + j] = temp % BigInt::base;
 		}
 		ret.number[i + b.number.size()] += carry;
 	}
@@ -364,7 +368,7 @@ BigInt operator*(const BigInt &a, const BigInt &b)
 	if(ret.number.empty())
 	{
 		ret.number.push_back(0);
-		ret.positive = 0;
+		ret.positive = false;
 	}
 	return ret;
 }
@@ -384,14 +388,14 @@ BigInt operator%(const BigInt &a, const BigInt &b)
 BigInt operator-(const BigInt &a)
 {
 	BigInt ret(a);
-	ret.positive ^= 1;
+	ret.positive ^= true;
 	return ret;
 }
 
 BigInt BigInt::abs(const BigInt &a)
 {
 	BigInt ret(a);
-	ret.positive = 0;
+	ret.positive = false;
 	return ret;
 }
 

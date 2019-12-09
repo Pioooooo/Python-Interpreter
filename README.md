@@ -13,19 +13,24 @@ Everything
 
 * **2019/11/07:**
 
-> 1. Install WSL
-> 2. Generate SSH keys
+> 1. Installed WSL
+> 2. Generated SSH keys
 > 3. Set up repository on Github
-> 4. Configure git
+> 4. Configured git
 
 * **2019/11/15：**
 
-> 1. Add declaration of the virtual functions in class Python3Parser
+> 1. Added declaration of the virtual functions in class Python3Parser
 > 2. New branch dev for better version control
 
 * **2019/12/08:**
 
-> 1. Install and comfigure CLion
-> 2. Finish class BigInt, class Object
+> 1. Installed and configured CLion
+> 2. Finished class BigInt, class Object
 > 3. Modified Python3.g4 and regenerated antlr runtime libraries
-> 4. Implement functions to be overrided in Evalvisitor
+> 4. Implemented functions to be overrided in Evalvisitor
+
+* **2019/12/09**
+
+> 1. Fixed Compile Error under -O3 option
+>

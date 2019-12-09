@@ -44,9 +44,9 @@ public:
 	BigInt &operator/=(const BigInt &b);
 	BigInt &operator%=(const BigInt &b);
 	BigInt &operator++();
-	const BigInt operator++(int b);
+	BigInt operator++(int b);
 	BigInt &operator--();
-	const BigInt operator--(int b);
+	BigInt operator--(int b);
 
 	static double div(const BigInt &a, const BigInt &b);
 	static BigInt abs(const BigInt &a);
