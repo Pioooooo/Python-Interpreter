@@ -16,15 +16,15 @@ public:
 	EvalVisitor();
 
 private:
+
 	typedef std::unordered_map<std::string, Object> OMap;
 	typedef std::vector<OMap> MVector;
 
-	std::vector<MVector> variables;
+	MVector variables;
 
-	OMap &global()
-	{
-		return variables[0][0];
-	}
+	OMap &global();
+
+	OMap &current();
 
 	Object FindVar(const Object &name);
 

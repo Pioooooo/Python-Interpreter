@@ -140,7 +140,7 @@ BigInt &BigInt::operator/=(const BigInt &b)
 		std::cerr << "Error: divisor cannot be 0.\n";
 		return *this;
 	}
-	ret.number.resize(number.size() - b.number.size() + 1);
+	ret.number.resize(number.size() + 1 > b.number.size() ? number.size() - b.number.size() + 1 : 0);
 	for(int i = number.size() - b.number.size(); i >= 0; i--)
 	{
 		while(greater(*this, b, i))
@@ -157,6 +157,8 @@ BigInt &BigInt::operator/=(const BigInt &b)
 			ret.number[i]++;
 		}
 	}
+	if(*this != 0)
+		ret -= ret.positive;
 	while(!ret.number.empty() && ret.number.back() == 0)
 		ret.number.pop_back();
 	if(ret.number.empty())
@@ -164,8 +166,6 @@ BigInt &BigInt::operator/=(const BigInt &b)
 		ret.number.push_back(0);
 		ret.positive = false;
 	}
-	if(*this != 0)
-		ret -= ret.positive;
 	return *this = ret;
 }
 
@@ -173,7 +173,7 @@ BigInt &BigInt::operator%=(const BigInt &b)
 {
 	BigInt ret;
 	ret.positive = positive ^ b.positive;
-	ret.number.resize(number.size() - b.number.size() + 1);
+	ret.number.resize(number.size() + 1 > b.number.size() ? number.size() - b.number.size() + 1 : 0);
 	if(b.number.size() == 1 && b.number[0] == 0)
 	{
 		std::cerr << "Error: divisor cannot be 0.\n";
