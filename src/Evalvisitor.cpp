@@ -59,7 +59,7 @@ antlrcpp::Any EvalVisitor::visitSmall_stmt(Python3Parser::Small_stmtContext *ctx
 		return visit(ctx->flow_stmt());
 	}
 	visit(ctx->expr_stmt());
-	return Object();
+	return Object(NORMAL);
 }
 
 antlrcpp::Any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
@@ -67,7 +67,8 @@ antlrcpp::Any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
 	auto testlists = ctx->testlist();
 	if(!ctx->augassign())
 	{
-		auto val = visit(testlists.back()).as<List>();
+		auto ret = visit(testlists.back()).as<Object>();
+		auto &val = ret.list_v;
 		for(int i = 0; i < testlists.size() - 1; i++)
 		{
 			for(unsigned j = 0; j < val.size(); j++)
@@ -75,7 +76,7 @@ antlrcpp::Any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
 				AssignVar(testlists[i]->test()[j]->or_test()->and_test()[0]->not_test()[0]->comparison()->arith_expr()[0]->term()[0]->factor()[0]->atom_expr()->atom()->NAME()->toString(), val[j]);
 			}
 		}
-		return val;
+		return ret;
 	}
 	Object name(testlists[0]->test()[0]->or_test()->and_test()[0]->not_test()[0]->comparison()->arith_expr()[0]->term()[0]->factor()[0]->atom_expr()->atom()->NAME()->toString());
 	if(!FindVar(name).toBool())
@@ -84,28 +85,25 @@ antlrcpp::Any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
 	}
 	if(ctx->augassign()->ADD_ASSIGN())
 	{
-		return GetVar(name)->second += visit(testlists[1]).as<List>()[0];
+		return GetVar(name)->second += visit(testlists[1]).as<Object>().list_v[0];
 	}
 	if(ctx->augassign()->SUB_ASSIGN())
 	{
-		return GetVar(name)->second -= visit(testlists[1]).as<List>()[0];
+		return GetVar(name)->second -= visit(testlists[1]).as<Object>().list_v[0];
 	}
 	if(ctx->augassign()->MULT_ASSIGN())
 	{
-		return GetVar(name)->second *= visit(testlists[1]).as<List>()[0];
+		return GetVar(name)->second *= visit(testlists[1]).as<Object>().list_v[0];
 	}
 	if(ctx->augassign()->DIV_ASSIGN())
 	{
-		return GetVar(name)->second /= visit(testlists[1]).as<List>()[0];
+		return GetVar(name)->second /= visit(testlists[1]).as<Object>().list_v[0];
 	}
 	if(ctx->augassign()->MOD_ASSIGN())
 	{
-		return GetVar(name)->second %= visit(testlists[1]).as<List>()[0];
+		return GetVar(name)->second %= visit(testlists[1]).as<Object>().list_v[0];
 	}
-	if(ctx->augassign()->IDIV_ASSIGN())
-	{
-		return GetVar(name)->second = GetVar(name)->second.idiv(visit(testlists[1]).as<List>()[0]);
-	}
+	return GetVar(name)->second = GetVar(name)->second.idiv(visit(testlists[1]).as<Object>().list_v[0]);
 }
 
 antlrcpp::Any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx)//Useless
@@ -120,21 +118,29 @@ antlrcpp::Any EvalVisitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx)
 
 antlrcpp::Any EvalVisitor::visitBreak_stmt(Python3Parser::Break_stmtContext *ctx)
 {
-	return BREAK;
+	return Object(BREAK);
 }
 
 antlrcpp::Any EvalVisitor::visitContinue_stmt(Python3Parser::Continue_stmtContext *ctx)
 {
-	return CONTINUE;
+	return Object(CONTINUE);
 }
 
 antlrcpp::Any EvalVisitor::visitReturn_stmt(Python3Parser::Return_stmtContext *ctx)
 {
 	if(ctx->testlist())
 	{
-		return visit(ctx->testlist());
+		auto ret = visit(ctx->testlist()).as<Object>();
+		if(ret.list_v.size() == 1)
+		{
+			auto tmp = ret.list_v[0];
+			tmp.flow_v = RETURN;
+			return tmp;
+		}
+		ret.flow_v = RETURN;
+		return ret;
 	}
-	return Object();
+	return Object(RETURN);
 }
 
 antlrcpp::Any EvalVisitor::visitCompound_stmt(Python3Parser::Compound_stmtContext *ctx)
@@ -165,20 +171,14 @@ antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx
 	while(visit(ctx->test()).as<Object>().toBool())
 	{
 		Object ret = visit(ctx->suite()).as<Object>();
-		if(ret.type != NONE)
+		switch(ret.flow_v)
 		{
-			if(ret.type != BOOL)
-			{
-				return ret;
-			}
-			if(ret.toBool())
-			{
-				continue;
-			}
-			else
-			{
-				break;
-			}
+		case BREAK:
+			return Object();
+		case RETURN:
+			return ret;
+		default:
+			continue;
 		}
 	}
 	return Object();
@@ -188,26 +188,17 @@ antlrcpp::Any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx)
 {
 	if(ctx->simple_stmt())
 	{
-		Object ret = visit(ctx->simple_stmt()).as<Object>();
-		if(ret.type!=NONE)
-		{
-			return ret;
-		}
+		return visit(ctx->simple_stmt()).as<Object>();
 	}
 	else
 	{
 		auto stmts = ctx->stmt();
 		for(auto &stmt:stmts)
 		{
-			auto ret = visit(stmt);
-			if(!ret.is<Object>())
+			auto ret = visit(stmt).as<Object>();
+			if(ret.flow_v != NORMAL)
 			{
-				return Object();
-			}
-			auto val = ret.as<Object>();
-			if(val.type!=NONE)
-			{
-				return val;
+				return ret;
 			}
 		}
 	}
@@ -264,7 +255,7 @@ antlrcpp::Any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx
 {
 	auto arith_exprs = ctx->arith_expr();
 	auto comp_ops = ctx->comp_op();
-	if(comp_ops.size() == 0)
+	if(comp_ops.empty())
 	{
 		return visit(arith_exprs[0]);
 	}
@@ -396,10 +387,7 @@ antlrcpp::Any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx)
 	{
 		return visit(ctx->factor());
 	}
-	if(ctx->addsub_op()->MINUS())
-	{
-		return -visit(ctx->factor()).as<Object>();
-	}
+	return -visit(ctx->factor()).as<Object>();
 }
 
 antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
@@ -411,34 +399,39 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 	std::string name = ctx->atom()->NAME()->toString();
 	if(name == "print")
 	{
-		List trailers = visit(ctx->trailer()).as<List>();
-		for(unsigned i = 0; i < trailers.size() - 1; i++)
+		if(!ctx->trailer()->arglist())
 		{
-			std::cout << trailers[i].toString() << ' ';
+			std::cout << std::endl;
+			return Object();
 		}
-		std::cout << trailers[trailers.size() - 1].toString() << '\n';
+		List syntax = visit(ctx->trailer()).as<Object>().list_v;
+		for(unsigned i = 0; i < syntax.size() - 1; i++)
+		{
+			std::cout << syntax[i].toString() << ' ';
+		}
+		std::cout << syntax[syntax.size() - 1].toString() << '\n';
 		return Object();
 	}
 	if(name == "int")
 	{
-		return Object(visit(ctx->trailer()).as<List>()[0].toInt());
+		return Object(visit(ctx->trailer()).as<Object>().list_v[0].toInt());
 	}
 	if(name == "float")
 	{
-		return Object(visit(ctx->trailer()).as<List>()[0].toFloat());
+		return Object(visit(ctx->trailer()).as<Object>().list_v[0].toFloat());
 	}
 	if(name == "bool")
 	{
-		return Object(visit(ctx->trailer()).as<List>()[0].toBool());
+		return Object(visit(ctx->trailer()).as<Object>().list_v[0].toBool());
 	}
 	if(name == "str")
 	{
-		return Object(visit(ctx->trailer()).as<List>()[0].toString());
+		return Object(visit(ctx->trailer()).as<Object>().list_v[0].toString());
 	}
 	auto tmp = functable.find(name);
 	if(tmp != functable.end())
 	{
-		variables.emplace_back();
+		OMap tmpo;
 		auto function = tmp->second;
 		if(ctx->trailer()->arglist())
 		{
@@ -447,22 +440,22 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 			{
 				if(arguments[i]->NAME())
 				{
-					AssignVar(Object(arguments[i]->NAME()->toString()), visit(arguments[i]->test()));
+					tmpo.insert({arguments[i]->NAME()->toString(), visit(arguments[i]->test())});
 				}
 				else
 				{
-					AssignVar(function.params[i].first, visit(arguments[i]->test()));
+					tmpo.insert({function.params[i].first, visit(arguments[i]->test())});
 				}
 			}
 		}
-		auto ret = visit(function.suite);
+		variables.push_back(tmpo);
+		Object ret = visit(function.suite).as<Object>();
+		ret.flow_v = NORMAL;
 		variables.pop_back();
 		return ret;
 	}
-	else
-	{
-		std::cerr << "Error: Name " << name << " is not defined." << std::endl;
-	}
+	std::cerr << "Error: Name " << name << " is not defined." << std::endl;
+	return Object();
 }
 
 antlrcpp::Any EvalVisitor::visitTrailer(Python3Parser::TrailerContext *ctx)//Useless
@@ -516,10 +509,7 @@ antlrcpp::Any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx)
 	{
 		return Object(false);
 	}
-	if(ctx->test())
-	{
-		return visit(ctx->test());
-	}
+	return visit(ctx->test());
 }
 
 antlrcpp::Any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx)
@@ -530,10 +520,10 @@ antlrcpp::Any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	{
 		ret.push_back(visit(test).as<Object>());
 	}
-	return ret;
+	return Object(ret);
 }
 
-antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)
+antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)//Useless
 {
 	auto arguments = ctx->argument();
 	List ret;
@@ -541,13 +531,13 @@ antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)
 	{
 		ret.push_back(visit(argument).as<Object>());
 	}
-	return ret;
+	return Object(ret);
 }
 
 antlrcpp::Any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
 {
 	return visit(ctx->test());
-}
+}//Useless
 
 Object EvalVisitor::FindVar(const Object &name)
 {
@@ -561,11 +551,7 @@ std::unordered_map<std::string, Object>::iterator EvalVisitor::GetVar(const Obje
 	{
 		return pos;
 	}
-	pos = global().find(name.toString());
-	if(pos != global().end())
-	{
-		return pos;
-	}
+	return global().find(name.toString());
 }
 
 Object &EvalVisitor::InsertVar(const Object &name, const Object &val)

@@ -33,4 +33,9 @@ Everything
 * **2019/12/09**
 
 > 1. Fixed Compile Error under -O3 option
->
+
+* **2019/12/10**
+
+> 1. Fixed bad_alloc when dividing
+> 2. Rewrote Object.h without templates
+> 3. Fixed flow control

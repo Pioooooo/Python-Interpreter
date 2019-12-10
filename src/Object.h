@@ -13,10 +13,10 @@ class Object;
 typedef std::vector<Object> List;
 enum flow_t
 {
+	NORMAL,
 	BREAK,
 	CONTINUE,
-	RETURN,
-	NORMAL
+	RETURN
 };
 enum type_t
 {
@@ -25,8 +25,7 @@ enum type_t
 	FLOAT,
 	BOOL,
 	STRING,
-	LIST,
-	FLOW
+	LIST
 };
 
 class Object
@@ -37,7 +36,7 @@ class Object
 		return os;
 	}
 
-private:
+public:
 	BigInt int_v;
 	double float_v;
 	bool bool_v;
@@ -49,31 +48,35 @@ public:
 	flow_t flow_v;
 
 public:
-	Object(): type(NONE)
+	Object(): type(NONE), flow_v(NORMAL)
 	{
 	}
 
-	Object(type_t _type): type(_type)
+	Object(type_t _type): type(_type), flow_v(NORMAL)
 	{
 	}
 
-	Object(BigInt val): type(INT), int_v(val)
+	Object(BigInt val): type(INT), flow_v(NORMAL), int_v(val)
 	{
 	}
 
-	Object(double val): type(FLOAT), float_v(val)
+	Object(double val): type(FLOAT), flow_v(NORMAL), float_v(val)
 	{
 	}
 
-	Object(bool val): type(BOOL), bool_v(val)
+	Object(bool val): type(BOOL), flow_v(NORMAL), bool_v(val)
 	{
 	}
 
-	Object(std::string val): type(STRING), string_v(val)
+	Object(std::string val): type(STRING), flow_v(NORMAL), string_v(val)
 	{
 	}
 
-	Object(List val): type(LIST), list_v(val)
+	Object(List val): type(LIST), flow_v(NORMAL), list_v(val)
+	{
+	}
+
+	Object(flow_t _flow_v): type(NONE), flow_v(_flow_v)
 	{
 	}
 
@@ -253,7 +256,6 @@ public:
 		return Object(NONE);
 	}
 
-
 	Object operator-(const Object &b) const
 	{
 		if(type == NONE || b.type == NONE)
@@ -272,7 +274,6 @@ public:
 		}
 		return Object(toInt() - b.toInt());
 	}
-
 
 	Object operator*(const Object &b) const
 	{
@@ -311,7 +312,6 @@ public:
 		return Object(NONE);
 	}
 
-
 	Object operator/(const Object &b) const
 	{
 		if(type == NONE || b.type == NONE)
@@ -331,7 +331,6 @@ public:
 		return Object(BigInt::div(toInt(), b.toInt()));
 	}
 
-
 	Object operator%(const Object &b) const
 	{
 		if((type != INT && type != BOOL) || (b.type != INT && b.type != BOOL))
@@ -341,7 +340,6 @@ public:
 		}
 		return Object(toInt() % b.toInt());
 	}
-
 
 	Object idiv(const Object &b) const
 	{
@@ -353,42 +351,35 @@ public:
 		return Object(toInt() / b.toInt());
 	}
 
-
 	Object &operator|=(const Object &b)
 	{
 		return *this = (*this || b);
 	}
-
 
 	Object &operator&=(const Object &b)
 	{
 		return *this = (*this && b);
 	}
 
-
 	Object &operator+=(const Object &b)
 	{
 		return *this = (*this + b);
 	}
-
 
 	Object &operator-=(const Object &b)
 	{
 		return *this = (*this - b);
 	}
 
-
 	Object &operator*=(const Object &b)
 	{
 		return *this = (*this * b);
 	}
 
-
 	Object &operator/=(const Object &b)
 	{
 		return *this = (*this / b);
 	}
-
 
 	Object &operator%=(const Object &b)
 	{
