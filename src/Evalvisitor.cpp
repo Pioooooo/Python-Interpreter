@@ -531,6 +531,10 @@ antlrcpp::Any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	{
 		ret.push_back(visit(test).as<Object>());
 	}
+	if(ret.size() == 1 && ret[0].type == LIST)
+	{
+		return ret[0];
+	}
 	return Object(ret);
 }
 
