@@ -262,7 +262,7 @@ antlrcpp::Any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx
 	Object result(true), former = visit(arith_exprs[0]).as<Object>(), cur;
 	for(unsigned i = 0; i < comp_ops.size(); i++)
 	{
-		if(!result)
+		if(!result.toBool())
 		{
 			return result;
 		}
