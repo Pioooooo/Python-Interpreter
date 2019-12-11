@@ -39,3 +39,10 @@ Everything
 > 1. Fixed bad_alloc when dividing
 > 2. Rewrote Object.h without templates
 > 3. Fixed flow control
+
+* **2019/12/11**
+
+> 1. Fixed continuous comparison
+> 2. Fixed functions with parameters with default values
+> 3. Fixed functions returning testlists
+> 4. Fixed a rare bug in integer division
