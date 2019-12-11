@@ -436,7 +436,7 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 	if(tmp != functable.end())
 	{
 		OMap tmpo;
-		auto function = tmp->second;
+		auto &function = tmp->second;
 		if(ctx->trailer()->arglist())
 		{
 			auto arguments = ctx->trailer()->arglist()->argument();
@@ -450,6 +450,13 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 				{
 					tmpo.insert({function.params[i].first, visit(arguments[i]->test())});
 				}
+			}
+		}
+		for(auto &param : function.params)
+		{
+			if(tmpo.find(param.first) == tmpo.end())
+			{
+				tmpo.insert(param);
 			}
 		}
 		variables.push_back(tmpo);
