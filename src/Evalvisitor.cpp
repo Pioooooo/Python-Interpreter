@@ -170,7 +170,7 @@ antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx
 {
 	while(visit(ctx->test()).as<Object>().toBool())
 	{
-		Object ret = visit(ctx->suite()).as<Object>();
+		auto ret = visit(ctx->suite()).as<Object>();
 		switch(ret.flow_v)
 		{
 		case BREAK:
@@ -319,7 +319,7 @@ antlrcpp::Any EvalVisitor::visitArith_expr(Python3Parser::Arith_exprContext *ctx
 	{
 		return visit(terms[0]);
 	}
-	Object result = visit(terms[0]).as<Object>();
+	auto result = visit(terms[0]).as<Object>();
 	for(unsigned i = 0; i < addsub_ops.size(); i++)
 	{
 		if(addsub_ops[i]->ADD())
@@ -344,7 +344,7 @@ antlrcpp::Any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx)
 	{
 		return visit(factors[0]);
 	}
-	Object result = visit(factors[0]).as<Object>();
+	auto result = visit(factors[0]).as<Object>();
 	for(unsigned i = 0; i < muldiv_ops.size(); i++)
 	{
 		if(muldiv_ops[i]->STAR())
@@ -460,7 +460,7 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 			}
 		}
 		variables.push_back(tmpo);
-		Object ret = visit(function.suite).as<Object>();
+		auto ret = visit(function.suite).as<Object>();
 		ret.flow_v = NORMAL;
 		variables.pop_back();
 		return ret;
@@ -469,7 +469,7 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx)
 	return Object();
 }
 
-antlrcpp::Any EvalVisitor::visitTrailer(Python3Parser::TrailerContext *ctx)//Useless
+antlrcpp::Any EvalVisitor::visitTrailer(Python3Parser::TrailerContext *ctx)
 {
 	return visit(ctx->arglist());
 }
@@ -538,7 +538,7 @@ antlrcpp::Any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx)
 	return Object(ret);
 }
 
-antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)//Useless
+antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)
 {
 	auto arguments = ctx->argument();
 	List ret;
@@ -552,7 +552,7 @@ antlrcpp::Any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx)//Use
 antlrcpp::Any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
 {
 	return visit(ctx->test());
-}//Useless
+}
 
 Object EvalVisitor::FindVar(const Object &name)
 {

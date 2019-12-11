@@ -157,8 +157,12 @@ BigInt &BigInt::operator/=(const BigInt &b)
 			ret.number[i]++;
 		}
 	}
-	if(*this != 0)
+	while(!number.empty() && number.back() == 0)
+		number.pop_back();
+	if(!number.empty())
+	{
 		ret -= ret.positive;
+	}
 	while(!ret.number.empty() && ret.number.back() == 0)
 		ret.number.pop_back();
 	if(ret.number.empty())
